@@ -1,0 +1,1 @@
+"""Easy Share application package."""
