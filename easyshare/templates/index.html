@@ -1,5 +1,78 @@
-{% extends 'base.html' %}{% block content %}
-<section class="hero"><div><h1>文件分享</h1><p class="muted">上传文件后，可从任何已授权设备安全下载。</p></div></section>
-<section class="card upload"><h2>上传新文件</h2><form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input name="file" type="file" required><button type="submit">开始上传</button></form></section>
-<section class="card"><div class="section-title"><h2>文件列表</h2><span>{{ files|length }} 个文件</span></div>{% if files %}<div class="file-list">{% for file in files %}<article class="file"><div class="file-icon">↓</div><div class="file-info"><strong title="{{ file.original_name }}">{{ file.original_name }}</strong><small>{{ (file.size / 1024 / 1024)|round(2) }} MB · {{ file.uploaded_at[:16].replace('T', ' ') }} UTC</small></div><a class="button secondary" href="{{ url_for('download', file_id=file.id) }}">下载</a><form action="{{ url_for('delete', file_id=file.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger" type="submit">删除</button></form></article>{% endfor %}</div>{% else %}<div class="empty">还没有文件，上传第一个吧。</div>{% endif %}</section>
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="eyebrow">PRIVATE FILE SPACE</span>
+    <h1>轻松分享，安心保存。</h1>
+    <p>将文件上传到你的私人空间，随时从已授权设备安全访问。</p>
+  </div>
+  <div class="hero-badge" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
+  </div>
+</section>
+
+<section class="card upload-card">
+  <div class="card-heading">
+    <div class="heading-icon upload-heading-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>
+    </div>
+    <div><h2>上传新文件</h2><p>单个文件最大 {{ config.MAX_CONTENT_LENGTH // 1024 // 1024 }} MB</p></div>
+  </div>
+  <form class="upload-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="file-picker" for="file">
+      <span class="picker-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M12 18v-6m-3 3 3-3 3 3"/></svg>
+      </span>
+      <span class="picker-copy"><strong>选择要分享的文件</strong><small>点击浏览本地文件</small></span>
+      <span class="browse-button">选择文件</span>
+      <input id="file" name="file" type="file" required>
+    </label>
+    <button class="primary-button" type="submit">
+      开始上传
+      <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </form>
+</section>
+
+<section class="card files-card">
+  <div class="section-title">
+    <div><h2>我的文件</h2><p>所有文件均受登录验证保护</p></div>
+    <span class="count-badge">{{ files|length }} 个文件</span>
+  </div>
+  {% if files %}
+    <div class="file-list">
+      {% for file in files %}
+        <article class="file">
+          <div class="file-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+          </div>
+          <div class="file-info">
+            <strong title="{{ file.original_name }}">{{ file.original_name }}</strong>
+            <small>{{ (file.size / 1024 / 1024)|round(2) }} MB <i></i> {{ file.uploaded_at[:16].replace('T', ' ') }} UTC</small>
+          </div>
+          <div class="file-actions">
+            <a class="icon-button download" href="{{ url_for('download', file_id=file.id) }}" aria-label="下载 {{ file.original_name }}" title="下载">
+              <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5"/><path d="M5 20h14"/></svg>
+            </a>
+            <form action="{{ url_for('delete', file_id=file.id) }}" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="icon-button delete" type="submit" aria-label="删除 {{ file.original_name }}" title="删除">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16m-10 4v6m4-6v6M9 7l1-3h4l1 3m3 0-1 14H7L6 7"/></svg>
+              </button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2"/></svg>
+      </div>
+      <h3>这里还没有文件</h3>
+      <p>上传第一个文件，开始你的安全分享。</p>
+    </div>
+  {% endif %}
+</section>
 {% endblock %}

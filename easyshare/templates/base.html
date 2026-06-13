@@ -7,11 +7,38 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header><a class="brand" href="{{ url_for('index') }}">Easy Share</a>{% if session.authenticated %}<form action="{{ url_for('logout') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link" type="submit">退出</button></form>{% endif %}</header>
-<main>
-{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
-{% block content %}{% endblock %}
-</main>
-<footer>私有、安全、简单的文件中转站</footer>
+  <div class="page-glow page-glow-one"></div>
+  <div class="page-glow page-glow-two"></div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="Easy Share 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/><path d="M17 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5"/></svg>
+        </span>
+        <span>Easy Share</span>
+      </a>
+      {% if session.authenticated %}
+        <div class="header-status"><span class="status-dot"></span>安全连接</div>
+        <form action="{{ url_for('logout') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="text-button" type="submit">退出登录</button>
+        </form>
+      {% endif %}
+    </div>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="notice {{ category }}" role="status">
+          <span class="notice-dot"></span>{{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <span class="footer-shield">✓</span>
+    文件仅对已授权用户可见
+  </footer>
 </body>
 </html>

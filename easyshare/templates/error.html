@@ -1,1 +1,9 @@
-{% extends 'base.html' %}{% block content %}<section class="card narrow"><h1>操作未完成</h1><p>{{ message }}</p><a class="button" href="{{ url_for('index') }}">返回首页</a></section>{% endblock %}
+{% extends 'base.html' %}
+{% block content %}
+<section class="card error-card">
+  <div class="error-icon">!</div>
+  <h1>操作未完成</h1>
+  <p>{{ message }}</p>
+  <a class="primary-button" href="{{ url_for('index') }}">返回首页</a>
+</section>
+{% endblock %}
