@@ -1,0 +1,21 @@
+[Unit]
+Description=Easy Share file server
+After=network.target
+
+[Service]
+Type=simple
+User=easyshare
+Group=easyshare
+WorkingDirectory=/opt/easyshare
+EnvironmentFile=/etc/easyshare/easyshare.env
+ExecStart=/opt/easyshare/.venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 --access-logfile - 'easyshare.app:create_app()'
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/easyshare
+
+[Install]
+WantedBy=multi-user.target
